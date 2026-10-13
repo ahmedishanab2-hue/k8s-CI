@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = 'new-app-nti'
-        REPO_URL = "https://github.com/MohamedMagdy840/jenkins-repo.git"
+        REPO_URL = "https://github.com/ahmedishanab2-hue/k8s-CI.git"
     }
 
     stages {
@@ -26,14 +26,14 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
 
                         sh """
-                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+                            echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 
-                            docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKER_USERNAME}/${APP_NAME}:${BUILD_NUMBER}
+                            docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKER_USER}/${APP_NAME}:${BUILD_NUMBER}
 
-                            docker push ${DOCKER_USERNAME}/${APP_NAME}:${BUILD_NUMBER}
+                            docker push ${DOCKER_USER}/${APP_NAME}:${BUILD_NUMBER}
                         """
 
                     }
@@ -44,10 +44,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh """
                             ls -l
-                            sed 's|IMAGE_PLACEHOLDER|${DOCKER_USERNAME}/${APP_NAME}:${BUILD_NUMBER}|' k8s/deployment.yaml > deployment.yaml
+                            sed 's|IMAGE_PLACEHOLDER|${DOCKER_USER}/${APP_NAME}:${BUILD_NUMBER}|' k8s/deployment.yaml > deployment.yaml
 
                             kubectl apply -f deployment.yaml
                             kubectl apply -f k8s/service.yaml
