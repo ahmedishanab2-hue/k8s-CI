@@ -4,6 +4,8 @@ pipeline {
     environment {
         APP_NAME = 'new-app-nti'
         REPO_URL = "https://github.com/ahmedishanab2-hue/k8s-CI.git"
+        KUBECONFIG = '/var/jenkins_home/.kube/config'
+        PATH = "/var/jenkins_home:${env.PATH}"
     }
 
     stages {
